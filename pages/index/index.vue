@@ -65,6 +65,6 @@
 	.canvas {
 		width: 100vw;
 		margin: auto;
-		background-color: #ccc;
+		background-color: #eeeeee;
 	}
 </style>
