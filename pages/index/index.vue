@@ -20,7 +20,8 @@
 		canvasHeight,
 		canvasEle,
 		ctx,
-		obstacleBallList = [];
+		obstacleBallList = [],
+		newBall = null;
 
 	class Vector {
 		constructor(x, y) {
@@ -232,6 +233,14 @@
 		}
 
 		updata() {
+			if (codeFlag) {
+				SpaceEndTime = new Date().getTime();
+				if (SpaceEndTime - SpaceStartTime < 1000) {
+					TimeDif = SpaceEndTime - SpaceStartTime;
+				} else {
+					TimeDif = 1000;
+				}
+			}
 			this.y = this.oy + (30 / 1000) * TimeDif;
 			this.h = this.oh - (30 / 1000) * TimeDif;
 			this.draw();
@@ -239,17 +248,31 @@
 	}
 	export default {
 		methods: {
-			animateTouchStart(e) {
-				console.log("手指触摸动作开始", e);
+			animateTouchStart() {
+				if (!codeFlag) {
+					// console.log("按下了");
+					codeFlag = true;
+					SpaceStartTime = new Date().getTime();
+				}
 			},
-			animateTouchMove(e) {
-				console.log("手指触摸后移动", e);
+			animateTouchEnd() {
+				if (codeFlag) {
+					// console.log("送开了");
+					codeFlag = false;
+					newBall.vy = -10;
+					TimeDif = 0;
+					gameStart = true;
+				}
 			},
-			animateTouchEnd(e) {
-				console.log("手指触摸动作结束", e);
-			},
-			animateTouchCancel(e) {
+			animateTouchCancel() {
 				console.log("手指触摸动作被打断，如来电提醒，弹窗", e);
+				if (codeFlag) {
+					// console.log("送开了");
+					codeFlag = false;
+					newBall.vy = -10;
+					TimeDif = 0;
+					gameStart = true;
+				}
 			},
 			start(newVal, oldVal, owner, ins) {
 				if (newVal) {
@@ -258,7 +281,7 @@
 					canvasEle = document.querySelectorAll('.canvas>canvas')[0];
 					ctx = canvasEle.getContext('2d');
 
-					let newBall = new Ball(
+					newBall = new Ball(
 						canvasWidth - ballr * 2,
 						canvasHeight - ballr - recth,
 						ballr,
@@ -284,19 +307,10 @@
 					);
 
 					document.addEventListener("keydown", (e) => {
-						if (e.code == "Space") {
-							if (!codeFlag) {
-								// console.log("按下了");
-								codeFlag = true;
-								SpaceStartTime = new Date().getTime();
-							} else {
-								SpaceEndTime = new Date().getTime();
-								if (SpaceEndTime - SpaceStartTime < 1000) {
-									TimeDif = SpaceEndTime - SpaceStartTime;
-								} else {
-									TimeDif = 1000;
-								}
-							}
+						if (e.code == "Space" && !codeFlag) {
+							// console.log("按下了");
+							codeFlag = true;
+							SpaceStartTime = new Date().getTime();
 						}
 					});
 
